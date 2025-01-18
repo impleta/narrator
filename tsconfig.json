@@ -1,0 +1,22 @@
+{
+  "extends": "./node_modules/gts/tsconfig-google.json",
+  "compilerOptions": {
+    "rootDir": ".",
+    "outDir": "build",
+    "module": "ESNext",
+    "baseUrl": ".",
+    "moduleResolution": "node",
+    "resolveJsonModule": true,
+    "allowJs": true,
+    "types": ["node"],
+    "allowSyntheticDefaultImports": true,
+    "lib": ["ES2019", "DOM"],
+    "emitDecoratorMetadata": true,
+    "experimentalDecorators": true,
+  },
+  "include": [
+      "src/**/*.ts"
+    , "index.ts"
+  ],
+  "exclude": ["build", "node_modules", "**/*.spec.ts", "tests/**/*.js", "@types"]
+}

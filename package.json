@@ -1,0 +1,35 @@
+{
+  "name": "@impleta/narrator",
+  "version": "0.1.0",
+  "description": "",
+  "main": "./build/src/narrator.js",
+  "files": [
+    "build/src"
+  ],
+  "type": "module",
+  "scripts": {
+    "test": "echo \"Error: no test specified\" && exit 1",
+    "lint": "gts lint",
+    "clean": "gts clean",
+    "compile": "tsc",
+    "dev": "tsc-watch --onSuccess \"npm run postcompile\"",
+    "postcompile": "npm run addJsSuffix && echo 'Ready...'",
+    "addJsSuffix": "npx replace-in-file --configFile=replace-config.json --quiet",
+    "fix": "gts fix",
+    "prepare": "npm.cmd run compile",
+    "pretest": "npm.cmd run compile",
+    "posttest": "npm.cmd run lint"
+  },
+  "keywords": [],
+  "author": "",
+  "license": "ISC",
+  "dependencies": {
+    "playwright": "^1.49.1"
+  },
+  "devDependencies": {
+    "@types/node": "^22.7.5",
+    "gts": "^6.0.2",
+    "replace-in-file": "^8.3.0",
+    "typescript": "^5.7.3"
+  }
+}
