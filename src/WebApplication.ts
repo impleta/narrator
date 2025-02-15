@@ -1,10 +1,36 @@
 import {Browser, BrowserContext, Page, chromium} from 'playwright';
 
 export class WebApplication {
-  private browser: Browser | null = null;
-  private context: BrowserContext | null = null;
-  private pages: Page[] = [];
 
+  private static _headless: boolean = true;
+  private static _browserInitialized = false;
+
+  public static get headless(): boolean {
+    return WebApplication._headless;
+  }
+
+  public static set headless(value: boolean) {
+    if(WebApplication._browserInitialized) {
+      throw new Error('Cannot set headless after browser has been initialized');
+    }
+    WebApplication._headless = value;
+  }
+  private _browser: Browser | null = null;
+  public get browser(): Browser | null {
+    return this._browser;
+  }
+  public set browser(value: Browser | null) {
+    this._browser = value;
+  }
+  
+  private _context: BrowserContext | null = null;
+  public get context(): BrowserContext | null {
+    return this._context;
+  }
+  public set context(value: BrowserContext | null) {
+    this._context = value;
+  }
+  
   private static registeredInstances: WebApplication[] = [];
 
   static RegisterInstance(
@@ -25,23 +51,22 @@ export class WebApplication {
 
   // eslint-disable-next-line prettier/prettier
   @WebApplication.RegisterInstance
-  async initialize() {
-    this.browser = await chromium.launch();
+  async initialize(args?: {headless: boolean}) {
+    if (!args) {
+      args = {headless: WebApplication.headless};
+    }
+    this.browser = await chromium.launch(args);
     this.context = await this.browser.newContext();
+    WebApplication._browserInitialized = true;
   }
 
-  async newPage(url: string): Promise<Page> {
+  async gotoPage(url: string): Promise<Page> {
     if (!this.context) {
       throw new Error('WebApplication not initialized');
     }
     const page = await this.context.newPage();
     await page.goto(url);
-    this.pages.push(page);
     return page;
-  }
-
-  getPages(): Page[] {
-    return this.pages;
   }
 
   async close() {
@@ -54,17 +79,4 @@ export class WebApplication {
       await instance.close();
     }
   }
-}
-
-function CallOnExit(p0: (method: () => Promise<void>) => Promise<void>) {
-  return function (
-    target: Object,
-    propertyKey: string,
-    descriptor: PropertyDescriptor,
-  ) {
-    const originalMethod = descriptor.value;
-    descriptor.value = async function (...args: Object[]) {
-      return p0(() => originalMethod.apply(this, args));
-    };
-  };
 }
