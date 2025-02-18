@@ -1,5 +1,5 @@
 import { chromium, BrowserContext, Page } from 'playwright';
-import { WebApplication } from './WebApplication';
+import { WebApplication } from '../WebApplication';
 
 export class GitHubWebUI extends WebApplication {
   private static _instance: GitHubWebUI;

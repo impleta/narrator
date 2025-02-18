@@ -79,4 +79,8 @@ export class WebApplication {
       await instance.close();
     }
   }
+
+  static getInstances() {
+    return WebApplication.registeredInstances;
+  }
 }
