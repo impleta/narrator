@@ -1,6 +1,6 @@
 {
   "name": "@impleta/narrator",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "description": "A wrapper for Playwright, allowing for automating web applications via a REPL",
   "main": "./build/src/narrator.js",
   "files": [
