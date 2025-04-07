@@ -28,7 +28,7 @@ let title = await homePage.title();
 assert.equal(title, 'Breaking News, Latest News and Videos | CNN', 'Title is incorrect');
 ```
 
-Ideally, wrappers are built for specific applications which provide a domain-specific interface. 
+Ideally, wrappers deriving from WebApplication are built for specific applications which provide a domain-specific interface that can then be tested. See examples/GitHubWebUI in the source.
 
 ## Documentation
 
