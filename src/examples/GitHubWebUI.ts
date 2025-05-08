@@ -14,16 +14,6 @@ export class GitHubWebUI extends WebApplication {
    * @throws {Error} If the headless setting is changed after the instance is created.
    */
   static async launch(args?: {headless: boolean}): Promise<GitHubWebUI> {
-    /*
-    if (GitHubWebUI._instance) {
-      console.log('GitHubWebUI instance already created, returning existing instance');
-      if(args && args.headless !== this.headless) {
-        throw new Error('Cannot change headless setting after instance has been created');
-      }
-      return Promise.resolve(GitHubWebUI._instance);
-    }
-    */
-    console.log('Creating new GitHubWebUI instance');
     const instance = new GitHubWebUI();
     await instance.initialize(args);
 
