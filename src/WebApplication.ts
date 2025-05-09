@@ -52,17 +52,41 @@ export class WebApplication {
    * Gets the browser context.
    * @returns {BrowserContext | null} The browser context or null if not initialized.
    */
-  public get context(): BrowserContext | null {
+  public async getContext(): Promise<BrowserContext | null> {
+    await WebApplication.retryUntil(
+      () => this._context != null,
+      5000, // Total time to wait in milliseconds
+      10, // Time period between retries in milliseconds
+      "Initialization timed out after 5 seconds."
+    );
+
     return this._context;
   }
 
   /**
-   * Sets the browser context.
-   * @param {BrowserContext | null} value - The browser context to set.
+   * Retries a condition until it is met or the timeout is reached.
+   * @param {() => boolean} condition - The condition to evaluate.
+   * @param {number} [totalTimeToWait=5000] - The total time to wait in milliseconds.
+   * @param {number} [timeBetweenRetries=10] - The time interval between retries in milliseconds.
+   * @param {string} [messageOnTimeout="Condition not met within the specified time."] - The error message to throw if the timeout is reached.
+   * @throws {Error} If the condition is not met within the specified time.
    */
-  public set context(value: BrowserContext | null) {
-    this._context = value;
+  static async retryUntil(
+    condition: () => boolean, 
+    totalTimeToWait: number = 5000, 
+    timeBetweenRetries: number = 10,
+    messageOnTimeout: string = "Condition not met within the specified time."
+  ) {
+    const startTime = Date.now();
+
+    while (!condition()) {
+      if (Date.now() - startTime > totalTimeToWait) {
+        throw new Error(messageOnTimeout);
+      }
+      await new Promise(resolve => setTimeout(resolve, timeBetweenRetries));
+    }
   }
+  
   
   private static registeredInstances: WebApplication[] = [];
 
@@ -100,7 +124,7 @@ export class WebApplication {
       args = {headless: this.headless};
     }
     this.browser = await chromium.launch(args);
-    this.context = await this.browser.newContext();
+    this._context = await this.browser.newContext();
     this._browserInitialized = true;
   }
 
@@ -111,10 +135,11 @@ export class WebApplication {
    * @throws {Error} If the web application is not initialized.
    */
   async gotoPage(url: string): Promise<Page> {
-    if (!this.context) {
+    const context = await this.getContext();
+    if (!context) {
       throw new Error('WebApplication not initialized');
     }
-    const page = await this.context.newPage();
+    const page = await context.newPage();
     await page.goto(url);
     return page;
   }
@@ -123,7 +148,8 @@ export class WebApplication {
    * Closes the browser context and browser instance.
    */
   async close() {
-    await this.context!.close();
+    const context = await this.getContext();
+    await context!.close();
     await this.browser!.close();
   }
 
